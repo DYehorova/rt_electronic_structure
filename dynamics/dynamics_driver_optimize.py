@@ -139,11 +139,12 @@ class dynamics_driver():
             #ERRR
             #if step==20:
              #   quit()
-            if( np.mod( step, self.Nprint ) == 0 ) and step > 0:
+            if( np.mod( step, self.Nprint ) == 0 ) and step > 1:
 
                 print('Writing data at step ', step, 'and time', current_time, 'for RT-pDMET calculation')
                 self.print_data( current_time )
                 sys.stdout.flush()
+                quit()
             if current_time != 0 and step ==0:
                 print('Writing data at step ', step, 'and time', current_time, 'for RT-pDMET calculation')
                 fmt_str = '%20.8e'
@@ -546,10 +547,10 @@ class dynamics_driver():
        #current output file
         current    = np.zeros((8+3*self.tot_system.Nsites))
         current[0] = current_time
-        JL = 1j *self.tot_system.h_site[0,1] * ( self.tot_system.glob1RDM[1,0] - self.tot_system.glob1RDM[0,1] )
-        JR = 1j * self.tot_system.h_site[2,0] * ( self.tot_system.glob1RDM[0,2] - self.tot_system.glob1RDM[2,0] )
-        J = (1/(-0.001))*((JL+JR)/2)
-        J_2pi = (1/(-0.001))*((JL+JR)/2)*2*math.pi
+        JL = 1j *self.tot_system.h_site[0,1] * ( self.tot_system.glob1RDM[0,1] - self.tot_system.glob1RDM[1,0] )
+        JR = 1j * self.tot_system.h_site[2,0] * ( self.tot_system.glob1RDM[2,0] - self.tot_system.glob1RDM[0,2] )
+        J = (1/(0.001))*((JL+JR)/2)
+        J_2pi = (1/(0.001))*((JL+JR)/2)*2*math.pi
         current_rot=np.zeros((self.tot_system.Nsites), dtype=complex)
         current_glob=np.zeros((self.tot_system.Nsites), dtype=complex)
         for q in range(1, self.tot_system.Nsites-1):
@@ -581,13 +582,27 @@ class dynamics_driver():
             current_glob[q] = -(1/(-0.001)) *1j * self.tot_system.h_site[q, p]*(self.tot_system.glob1RDM[p,q] - self.tot_system.glob1RDM[q, p])
         current[1]=np.real(J)
         current[2]=np.real(J_2pi)
+        current[3]=np.imag(J)
+        current[4]=np.imag(J_2pi)
 
-        current[3:(3+self.tot_system.Nsites)]=np.real(current_glob)
-        current[(4+self.tot_system.Nsites):(4+2*self.tot_system.Nsites)]=np.real(current_rot)
-        current[(5+(2*self.tot_system.Nsites)):(5+(3*self.tot_system.Nsites))]= (1/(-0.005))*(corrdens_short-self.corrdens_old)/self.delt
-        current[(6+(3*self.tot_system.Nsites))] = np.imag(J)
-        current[(7+(3*self.tot_system.Nsites))] = np.imag(J_2pi)
+        current[5]=(1/(-0.001))*(corrdens_short[0]-self.corrdens_old[0])/self.delt
+        current[6]=(1/(-0.001))*(corrdens_short[1]-self.corrdens_old[1])/self.delt
+        current[7]=(1/(-0.001))*(corrdens_short[2]-self.corrdens_old[2])/self.delt
 
+        current[8]=np.real(current_glob[1])
+        print("glob real",np.real(current_glob))
+        current[9]=np.imag(current_glob[1])
+        print("glob im",np.imag(current_glob ))
+        print("rot real", np.real(current_rot))
+        current[10]=np.real(current_rot[1])
+        current[11]=np.imag(current_rot[1])
+        print("rot imag", np.imag(current_rot))
+
+        #current[3:(3+self.tot_system.Nsites)]=np.real(current_glob)
+        #current[(4+self.tot_system.Nsites):(4+2*self.tot_system.Nsites)]=np.real(current_rot)
+        #current[(5+(2*self.tot_system.Nsites)):(5+(3*self.tot_system.Nsites))]= (1/(-0.005))*(corrdens_short-self.corrdens_old)/self.delt
+        #current[(6+(3*self.tot_system.Nsites))] = np.imag(J)
+        #current[(7+(3*self.tot_system.Nsites))] = np.imag(J_2pi)
         np.savetxt( self.file_current, current.reshape(1, current.shape[0]), fmt_str )
         self.file_current.flush()
 

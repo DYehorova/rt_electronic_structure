@@ -8,8 +8,9 @@ import feb_8_update.dynamics.dynamics_driver_optimize as dynamic_driver
 boundary = False
 NL = 32
 NR = 31
-Nimp = 1
-Nsites = NL+NR+Nimp
+Ndots = 1
+Nimp = 4
+Nsites = NL+NR+Ndots
 Nele = Nsites
 Nfrag = int(Nsites/Nimp)
 impindx = []
@@ -44,7 +45,7 @@ else:
     timplead = 0.4
     h_site_multi, V_site_multi = \
         make_hams.make_ham_multi_imp_anderson_realspace(
-            Nimp, NL, NR, Vg, U, timp, timplead, Vbias, boundary, Full)
+            Ndots, NL, NR, Vg, U, timp, timplead, Vbias, boundary, Full)
 
 # Full = True
 Full = False
