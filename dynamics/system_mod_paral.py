@@ -1,14 +1,9 @@
 #Define a class for the total system
 
 import numpy as np
-import real_time_elec_structureGN.projected_dmet.fragment_mod_paral as fragment_mod
-import sys
-#Errr
-#import fragment_mod
-import os
-import real_time_elec_structureGN.scripts.utils as utils
+import feb_8_update.dynamics.fragment_mod_paral as fragment_mod
+import feb_8_update.scripts.utils as utils
 import multiprocessing as multproc
-
 import time
 
 ######## TOTAL SYSTEM CLASS #######
@@ -29,7 +24,7 @@ class system():
 
         #If running Hubbard-like model, need an array containing index of all sites that have hubbard U term
         self.hubsite_indx = hubsite_indx
-        print(self.hubsite_indx)    
+        print(self.hubsite_indx)
         if( self.hamtype == 1 and ( hubsite_indx is None or not isinstance(hubsite_indx, np.ndarray) ) ):
             print('ERROR: Did not specify an array of sites that contain Hubbard U term')
             print()
@@ -125,8 +120,8 @@ class system():
         self.NOevecs = np.flip(NOevecs,1)
 
     #####################################################################
-    
-    def get_new_mf1RDM( self, Nocc):   
+
+    def get_new_mf1RDM( self, Nocc):
         #Subroutine to obtain a new idempotent (mean-field) 1RDM from the
         #First Nocc natural orbitals of the global 1RDM
         #ie natural orbitals with the highest occupation

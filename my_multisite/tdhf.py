@@ -3,8 +3,7 @@ import numpy as np
 import scipy.linalg as la
 import math
 import sys
-sys.path.append('/storage/home/hcoda1/2/dyehorova3/p-jkretchmer3-0/baskedup/PaceCopy/dynamics/globNODynamics/')
-import real_time_elec_structureGN.scripts.integrators as integrators
+import feb_8_update.scripts.integrators as integrators
 
 #####################################################################
 
@@ -94,8 +93,8 @@ class tdhf():
         output[2] = Nele
         print(self.h_site[31,30])
         print(self.h_site[32,31])
-        JL = 1j*self.h_site[31,30]*(self.mf1RDM[31,30]-self.mf1RDM[30,31])
-        JR = 1j*self.h_site[32,31]*(self.mf1RDM[32,31]-self.mf1RDM[31,32])
+        JL = 1j*self.h_site[31,32]*(self.mf1RDM[32,31]-self.mf1RDM[31,32])
+        JR = 1j*self.h_site[33,32]*(self.mf1RDM[33,32]-self.mf1RDM[32,33])
         #JL = 1j*self.h_site[0,1]*(self.mf1RDM[0,1]-self.mf1RDM[1,0])
         #JR = 1j*self.h_site[2,0]*(self.mf1RDM[2,0]-self.mf1RDM[0,2])
         J = (1/0.001)*((JL+JR)/2)

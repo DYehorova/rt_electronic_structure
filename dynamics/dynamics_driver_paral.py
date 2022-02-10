@@ -1,6 +1,6 @@
 #Routines to run a real-time projected-DMET calculation
 #Need pyscf installed
-#something 
+#something
 import numpy as np
 import real_time_elec_structureGN.projected_dmet.system_mod_paral as system_mod
 import real_time_elec_structureGN.projected_dmet.mf1rdm_timedep_mod_G2 as mf1rdm_timedep_mod
@@ -51,8 +51,8 @@ class dynamics_driver():
 
         #self.tot_system.get_frag_corr1RDM()
         #print("dynamic global", self.tot_system.glob1RDM)
-        #print("dynamic mf1rdm", self.tot_system.mf1RDM)    
-        #quit() 
+        #print("dynamic mf1rdm", self.tot_system.mf1RDM)
+        #quit()
         #old_global = np.copy(self.tot_system.glob1RDM)
         #self.tot_system.get_frag_corr1RDM()
         #self.tot_system.get_glob1RDM()
@@ -111,8 +111,8 @@ class dynamics_driver():
         self.corrdens_old = np.zeros((self.tot_system.Nsites))
         #self.corrdens_old += 1
         #start_pool = time.time()
-        #self.frag_pool = multproc.Pool(nproc) 
-        #print("time to from pool", time.time()-start_pool)       
+        #self.frag_pool = multproc.Pool(nproc)
+        #print("time to from pool", time.time()-start_pool)
     #####################################################################
 
     def kernel( self ):
@@ -137,7 +137,7 @@ class dynamics_driver():
             if step==2:
                 quit()
             if( np.mod( step, self.Nprint ) == 0 ) and step > 0:
-                
+
                 print('Writing data at step ', step, 'and time', current_time, 'for RT-pDMET calculation')
                 self.print_data( current_time )
                 sys.stdout.flush()
@@ -158,14 +158,14 @@ class dynamics_driver():
                 corrdens = np.insert( corrdens, 0, current_time )
                 np.savetxt( self.file_corrdens, corrdens.reshape(1, corrdens.shape[0]), fmt_str )
                 self.file_corrdens.flush()
-                
+
                 sys.stdout.flush()
             #Integrate FCI coefficients and rotation matrix for all fragments
             print("####################")
             print("STEP", step)
             print("####################")
             self.integrate(self.nproc)
-            #ERRRR     
+            #ERRRR
             recording_data=time.time()
             print('Writing data at step ', step, 'and time', current_time, 'for RT-pDMET calculation')
             self.print_data( current_time )
@@ -300,7 +300,7 @@ class dynamics_driver():
             zero = np.zeros((self.tot_system.Nsites, self.tot_system.Nsites))
             eve_diag = np.diag( eve)
             eve_no_diag = eve - np.diag(eve_diag)
-            self.max_diagonalG = self.return_max_value(eve_no_diag) 
+            self.max_diagonalG = self.return_max_value(eve_no_diag)
             if np.allclose(eve_no_diag, zero,rtol=0, atol= 1e-12) == False:
                 print("GLOBAL DIAGOMALIZED LESS THEN 10e-12")
             print("diagonalized Global RDM", eve)
@@ -316,7 +316,7 @@ class dynamics_driver():
             exit()
 
             quit()
-    
+
 
     def return_max_value(self, array):
         largest = 0
@@ -387,20 +387,20 @@ class dynamics_driver():
         make_derivs = time.time()
         ddt_glob1RDM, ddt_NOevec, ddt_mf1RDM, G_site = mf1rdm_timedep_mod.get_ddt_mf1rdm_serial( self.dG, self.tot_system, round(self.tot_system.Nele/2) )
         print("making derivatives:", time.time()-make_derivs)
-   
+
     # print("ddt_mf1RDM", ddt_mf1RDM)
         #Use change in mf1RDM to calculate X-matrix for each fragment
         make_xmat = time.time()
         self.tot_system.get_frag_Xmat( ddt_mf1RDM )
         print("making xmat:", time.time()-make_xmat)
         #ERR
- #       G_site_max = self.return_max_value(G_site)        
+ #       G_site_max = self.return_max_value(G_site)
  #       G_MF_max = self.return_max_value( np.dot( G_site, self.tot_system.mf1RDM ))
  #       G_NO_max = self.return_max_value(np.dot(G_site, self.tot_system.NOevecs))
  #       ddt_mf_max = self.return_max_value(ddt_mf1RDM)
  #       ddt_NO_max = self.return_max_value(ddt_NOevec)
  #       fmt_str = '%20.8e'
- #       G_max = 0.0 
+ #       G_max = 0.0
  #       output    = np.zeros(8)
  #       output[0] = self.curr_time
  #       output[1] = G_max
@@ -440,7 +440,7 @@ class dynamics_driver():
 #            frag_pool.close()
 #            frag_pool.join()
         print("nproc", nproc)
-        no_paralel_start = time.time() 
+        no_paralel_start = time.time()
         change_CIcoeffs_list = []
 
         for ifrag, frag in enumerate(self.tot_system.frag_list):
@@ -450,7 +450,7 @@ class dynamics_driver():
         #frag_pool = multproc.Pool(processes=nproc)
         #print("fragpool is formed in","--- %s seconds ---" % (time.time()-frag_pool_time))
             #old_pool = np.copy(self.frag_pool)
-        
+
       #  apply_pool_time = time.time()
       #  change_CIcoeffs_list = self.frag_pool.starmap( applyham_wrapper, [(frag,self.delt) for frag in self.tot_system.frag_list] )
         #frag_pool.close()
@@ -489,7 +489,7 @@ class dynamics_driver():
         corrdens = np.insert( corrdens, 0, current_time )
         np.savetxt( self.file_corrdens, corrdens.reshape(1, corrdens.shape[0]), fmt_str )
         self.file_corrdens.flush()
-        
+
 
         #Print output data
         Nimp      = self.tot_system.frag_list[0].Nimp
@@ -522,27 +522,27 @@ class dynamics_driver():
         output[9:9+self.tot_system.Nsites] = np.copy(self.tot_system.NOevals)
         #change_NOevecs, change_mf1RDM = mf1rdm_timedep_mod.get_ddt_mf1rdm_serial( self.tot_system, round(self.tot_system.Nele/2) )
         #self.tot_system.get_frag_Xmat( change_mf1RDM )
-        current=np.zeros((self.tot_system.Nsites))
+        current=complex(np.zeros((self.tot_system.Nsites)))
         current_glob=np.zeros((self.tot_system.Nsites))
         for q in range(1, self.tot_system.Nsites-1):
             rfrag = self.tot_system.frag_list[self.tot_system.site_to_frag_list[q+1]]
             qfrag = self.tot_system.frag_list[self.tot_system.site_to_frag_list[q]]
             pfrag = self.tot_system.frag_list[self.tot_system.site_to_frag_list[q-1]]
-            
+
             rfrag.last_virt = rfrag.Nimp + rfrag.Nvirt
-            pfrag.last_virt = pfrag.Nimp + pfrag.Nvirt          
+            pfrag.last_virt = pfrag.Nimp + pfrag.Nvirt
             qfrag.last_virt = qfrag.Nimp + qfrag.Nvirt
-            
+
             rfrag.last_bath = 2*rfrag.Nimp + rfrag.Nvirt
-            pfrag.last_bath = 2*pfrag.Nimp + pfrag.Nvirt          
+            pfrag.last_bath = 2*pfrag.Nimp + pfrag.Nvirt
             qfrag.last_bath = 2*qfrag.Nimp + qfrag.Nvirt
-                        
+
             rindx = np.r_[ :rfrag.Nimp, rfrag.last_virt : rfrag.last_bath ]
             pindx = np.r_[ :pfrag.Nimp, pfrag.last_virt : pfrag.last_bath ]
             qindx = np.r_[ :qfrag.Nimp, qfrag.last_virt : qfrag.last_bath ]
             p = q-1
             r = q+1
-            
+
             current[q] = 0.5 * 1j * self.tot_system.h_site[q, p]*\
                  (np.linalg.multi_dot([qfrag.rotmat[p,qindx], qfrag.corr1RDM, qfrag.rotmat[q,qindx].conj().T]) - \
                     (np.linalg.multi_dot([pfrag.rotmat[p,pindx], pfrag.corr1RDM, pfrag.rotmat[q,pindx].conj().T])).conj().T)
@@ -551,10 +551,10 @@ class dynamics_driver():
                  ((np.linalg.multi_dot([rfrag.rotmat[r,rindx], rfrag.corr1RDM, rfrag.rotmat[q,rindx].conj().T])).conj().T - \
                     (np.linalg.multi_dot([qfrag.rotmat[r,qindx], qfrag.corr1RDM, qfrag.rotmat[q,qindx].conj().T])))
             current_glob[q] = 0.5 * 1j *self.tot_system.h_site[q, p]*(self.tot_system.glob1RDM[p,q] - self.tot_system.glob1RDM[q, p])
-            
+
         print("current", current)
         output[10+self.tot_system.Nsites:(10+2*self.tot_system.Nsites)] = np.copy(np.real(current))
-        output[11+2*self.tot_system.Nsites:11+3*self.tot_system.Nsites] = np.copy(np.imag(current)) 
+        output[11+2*self.tot_system.Nsites:11+3*self.tot_system.Nsites] = np.copy(np.imag(current))
         print(output[10+self.tot_system.Nsites:(10+2*self.tot_system.Nsites)])
         output[12+3*self.tot_system.Nsites] = np.copy(np.real(self.max_diagonalG))
         output[13+3*self.tot_system.Nsites] = np.copy(np.imag(self.max_diagonalG))
@@ -571,7 +571,7 @@ class dynamics_driver():
         self.file_output.flush()
 
         self.corrdens_old = np.copy(corrdens_short)
-        
+
         #Save total system to file for restart purposes using pickle
         file_system = open( 'restart_systemJ.dat', 'wb' )
         pickle.dump( self.tot_system, file_system )

@@ -2,9 +2,9 @@
 
 import numpy as np
 
-import real_time_elec_structureGN.projected_dmet.fci_mod as fci_mod
-import real_time_elec_structureGN.scripts.utils as utils
-import real_time_elec_structureGN.scripts.applyham_pyscf as applyham_pyscf
+import feb_8_update.dynamics.fci_mod as fci_mod
+import feb_8_update.scripts.utils as utils
+import feb_8_update.scripts.applyham_pyscf as applyham_pyscf
 import time
 
 ######## FRAGMENT CLASS #######
@@ -27,7 +27,7 @@ class fragment():
         self.virtrange = np.arange(self.Nimp, self.Nimp+self.Nvirt)
         self.bathrange = np.arange(self.Nimp+self.Nvirt, 2*self.Nimp+self.Nvirt)
         self.corerange = np.arange(2*self.Nimp+self.Nvirt, self.Nsites)
-        
+
         self.last_imp      = self.Nimp
         self.last_virt     = self.Nimp + self.Nvirt
         self.last_bath     = 2*self.Nimp + self.Nvirt
@@ -101,7 +101,7 @@ class fragment():
         #print("rotmat_small", rotmat_small)
         #rotate the 1 e- terms, h_emb currently ( impurities, bath, core ) x ( impurities, bath, core )
         h_emb = utils.rot1el( h_site, rotmat_small )
-        self.h_site = h_site 
+        self.h_site = h_site
 
         #define 1 e- term of size ( impurities, bath ) x ( impurities, bath ) that will only have 1/2 interaction with the core
         self.h_emb_halfcore = np.copy( h_emb[ :2*self.Nimp, :2*self.Nimp ] )
@@ -186,9 +186,9 @@ class fragment():
             self.full_corr1RDM[c][c] = 2
         corr1RDM_virt = np.insert(self.corr1RDM, self.Nimp, np.zeros((self.Nvirt, self.corr1RDM.shape[0])), 0)
         corr1RDM_virt = np.insert(corr1RDM_virt, self.Nimp, np.zeros((self.Nvirt, corr1RDM_virt.shape[0])), 1)
-        
-        self.full_corr1RDM[0:0+corr1RDM_virt.shape[0], 0:0+corr1RDM_virt.shape[1]] += corr1RDM_virt 
-        
+
+        self.full_corr1RDM[0:0+corr1RDM_virt.shape[0], 0:0+corr1RDM_virt.shape[1]] += corr1RDM_virt
+
         #print("self.full_corr1RDM", self.full_corr1RDM)
 
     #####################################################################
@@ -296,7 +296,7 @@ class fragment():
     #####################################################################
 
     def get_Xmat( self, mf1RDM, ddt_mf1RDM ):
-        
+
 
         #Subroutine to calculate the X-matrix to propagate embedding orbitals
 
@@ -341,7 +341,7 @@ class fragment():
 
         #Multiply difference in eigenalues and rotated time-derivative matrix
         self.Xmat[ self.Nimp:, self.Nimp: ] = np.multiply( eval_dif, self.Xmat[ self.Nimp:, self.Nimp: ] )
-        self.Xmat = np.triu(self.Xmat) + np.triu(self.Xmat,1).conjugate().transpose() 
+        self.Xmat = np.triu(self.Xmat) + np.triu(self.Xmat,1).conjugate().transpose()
         #ERRR
 #        print("self.Xmat", self.Xmat)
 #        quit()

@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 #from research.codes import diagonalize
-from codes import diagonalize
+from feb_8_update.static.codes import diagonalize
  #1 electron density matrix, C =spatial  orbitals, Ne = # of el
 
 def rdm_1el(C, Nocc):

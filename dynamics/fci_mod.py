@@ -3,8 +3,8 @@
 import numpy as np
 import sys
 import os
-import real_time_elec_structureGN.scripts.utils as utils
-import real_time_elec_structureGN.scripts.applyham_pyscf as applyham_pyscf
+import feb_8_update.scripts.utils as utils
+import feb_8_update.scripts.applyham_pyscf as applyham_pyscf
 import pyscf.fci
 from pyscf import gto, scf, ao2mo
 
@@ -12,7 +12,7 @@ from pyscf import gto, scf, ao2mo
 
 def FCI_GS( h, V, Ecore, Norbs, Nele ):
 
-   
+
     #Subroutine to perform groundstate FCI calculation using pyscf
 
     if( isinstance(Nele,tuple) ):

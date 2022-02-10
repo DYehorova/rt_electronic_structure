@@ -7,8 +7,8 @@ import time
 import numpy as np
 import sys
 import os
-import real_time_elec_structureGN.scripts.utils as utils
-import real_time_elec_structureGN.scripts.applyham_pyscf as applyham_pyscf
+import feb_8_update.scripts.utils as utils
+import feb_8_update.scripts.applyham_pyscf as applyham_pyscf
 from scipy.linalg import expm
 
 ##########################################################################

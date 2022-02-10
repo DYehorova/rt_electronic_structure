@@ -2,7 +2,7 @@ import numpy as np
 import scipy.linalg as la
 import sys
 import os
-from real_time_elec_structureGN.scripts.utils import *
+from feb_8_update.scripts.utils import *
 from pyscf import gto, scf, ao2mo
 
 #####################################################################

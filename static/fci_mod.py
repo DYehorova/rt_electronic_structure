@@ -1,11 +1,9 @@
 import numpy as np
 import sys
 import os
-#import research.codes as codes
-import codes
-import pyscf.fci 
+import feb_8_update.static.codes as codes
+import pyscf.fci
 from pyscf import gto, scf, ao2mo
-#import applyham_pyscf
 
 def RHF(h,V, Norbs, Nele):
     if( isinstance(Nele,tuple)  ):
@@ -21,8 +19,8 @@ def RHF(h,V, Norbs, Nele):
     mf.get_ovlp = lambda *args: np.eye(Norbs)
 
     mf._eri = ao2mo.restore(8, V, Norbs)
-   # evals, h = np.linalg.eigh(h_site) 
-   # mf.init_guess = h 
+   # evals, h = np.linalg.eigh(h_site)
+   # mf.init_guess = h
     mf.kernel()
     RDM = mf.make_rdm1()
     # add noise:
@@ -64,7 +62,7 @@ def FCI_GS( h, V, U, Norbs, Nele ):
     #First need an HF calculation (to get a better guess for the starting point )
     mf = scf.RHF(mol)
     mf.get_hcore = lambda *args: h #what is lambda ?
-    
+
     mf.get_ovlp = lambda *args: np.eye(Norbs)
 
     # why pyscf uses Nele and Josh uses Norb?

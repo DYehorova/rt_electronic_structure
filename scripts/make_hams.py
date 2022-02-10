@@ -9,7 +9,7 @@ def make_1D_hubbard( Nsites, U, boundary, Full=False ):
 
     t = 1.0
 
-    Tmat = np.zeros( (Nsites,Nsites) )   
+    Tmat = np.zeros( (Nsites,Nsites) )
     if( Full ):
         Vmat = np.zeros( (Nsites,Nsites,Nsites,Nsites) )
     else:
@@ -33,7 +33,7 @@ def make_1D_hubbard_arbitrary( Nsites, U, t, boundary, Full=False ):
         print("ERROR: Hubbard U is complex")
         exit()
 
-    Tmat = np.zeros( (Nsites,Nsites), dtype=complex )   
+    Tmat = np.zeros( (Nsites,Nsites), dtype=complex )
     if( Full ):
         Vmat = np.zeros( (Nsites,Nsites,Nsites,Nsites), dtype=complex )
     else:
@@ -83,7 +83,7 @@ def make_2D_hubbard( Nx, Ny, Nx_imp, Ny_imp, U, boundary, Full=False ):
     t = 1.0
 
     #Initialize matrices
-    Tmat = np.zeros( (Nsites,Nsites) )   
+    Tmat = np.zeros( (Nsites,Nsites) )
     if( Full ):
         Vmat = np.zeros( (Nsites,Nsites,Nsites,Nsites) )
         for i in range(Nsites):
@@ -146,7 +146,7 @@ def make_2D_hubbard( Nx, Ny, Nx_imp, Ny_imp, U, boundary, Full=False ):
 
 def make_ham_single_imp_anderson( Nlead, E_imp, U, A, B, delE_lead, energyorder=True, Full=False ):
     #subroutine to generate one and two electron integrals for the symmetric single impurity anderson impurity model
-    #spectral density is taken as the wide-band limit and is discretized following: 
+    #spectral density is taken as the wide-band limit and is discretized following:
     #Li, Levy, Swenson, Rabani, Miller, JCP, 138, 104110, 2013
 
     #NOTE NEED TO ADD THE POSSIBILITY OF ADDING A BIAS BETWEEN LEADS, WHICH MEANS WILL NEED TO CHANGE HOW ORDER THE STATES NEAR THE IMPURITY
@@ -220,7 +220,7 @@ def make_ham_single_imp_anderson( Nlead, E_imp, U, A, B, delE_lead, energyorder=
 def make_ham_single_imp_anderson_realspace( NL, NR, Vg, U, t, Vbias, tleads=1.0, Full=False ):
     #subroutine to generate one and two electron integrals for the symmetric single impurity anderson impurity model in real-space
     #ie have hopping terms between the lead states, as is done in RT-DMRG (see Heidrich-Meisner PRB 2009)
-    #Returns an (NL+NR+1)x(NL+NR+1) array of the 1 e- terms 
+    #Returns an (NL+NR+1)x(NL+NR+1) array of the 1 e- terms
     #Returns if Full=True an (NL+NR+1)^4 array of the 2e- terms or if Full=False simply returns U
     #The sites are ordered as the dot (impurity) site being first, followed in ascending order of the distance from the dot (impurity) with the left lead states coming before the right lead states
     #NL - number of sites in the left lead
@@ -262,8 +262,8 @@ def make_ham_single_imp_anderson_realspace( NL, NR, Vg, U, t, Vbias, tleads=1.0,
     #right lead
     for lead in range(NR-1):
         if( NR > NL and lead == NR-2 ):
-            indx1 = N-2 
-            indx2 = N-1 
+            indx1 = N-2
+            indx2 = N-1
         else:
             indx1 = 2*(lead+1)
             indx2 = 2*(lead+2)
@@ -301,7 +301,7 @@ def make_ham_single_imp_anderson_realspace( NL, NR, Vg, U, t, Vbias, tleads=1.0,
 def make_ham_wilson_chain( NL, NR, Vg, U, t, Vbias, tleads=1.0, Lambda=1.0, z=0.0, zonly=False, Full=False ):
     #subroutine to generate one and two electron integrals for a wilson chain for the symmetric single impurity anderson impurity model in real-space
     #ie have hopping terms between the lead states, which are damped further away from the lead (see Dias da Silva PRB 2008 and Anders PRB 2006)
-    #Returns an (NL+NR+1)x(NL+NR+1) array of the 1 e- terms 
+    #Returns an (NL+NR+1)x(NL+NR+1) array of the 1 e- terms
     #Returns if Full=True an (NL+NR+1)^4 array of the 2e- terms or if Full=False simply returns U
     #The sites are ordered as the dot (impurity) site being first, followed in ascending order of the distance from the dot (impurity) with the left lead states coming before the right lead states
     #NL - number of sites in the left lead
@@ -349,8 +349,8 @@ def make_ham_wilson_chain( NL, NR, Vg, U, t, Vbias, tleads=1.0, Lambda=1.0, z=0.
     #right lead
     for lead in range(NR-1):
         if( NR > NL and lead == NR-2 ):
-            indx1 = N-2 
-            indx2 = N-1 
+            indx1 = N-2
+            indx2 = N-1
         else:
             indx1 = 2*(lead+1)
             indx2 = 2*(lead+2)
@@ -391,7 +391,7 @@ def make_ham_wilson_chain( NL, NR, Vg, U, t, Vbias, tleads=1.0, Lambda=1.0, z=0.
 def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, Vbias, tleads=1.0, boundary=False, Full=False ):
     #subroutine to generate one and two electron integrals for the symmetric multi-impurity anderson impurity model in real-space
     #ie have hopping terms between the lead states, as is done in RT-DMRG (see Heidrich-Meisner PRB 2009)
-    #Returns an (NL+NR+Nimp)x(NL+NR+Nimp) array of the 1 e- terms 
+    #Returns an (NL+NR+Nimp)x(NL+NR+Nimp) array of the 1 e- terms
     #Returns if Full=True an (NL+NR+Nimp)^4 array of the 2e- terms or if Full=False simply returns U
     #The sites are ordered from left to right, with impurities being in the center of the two leads
     #If the number of impurities equals number of sites you get back Hubbard model with timp=timplead=tleads
@@ -427,31 +427,31 @@ def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, 
     left_indx = np.arange(NL)
     imp_indx  = np.arange(NL,NL+Nimp)
     right_indx = np.arange(NL+Nimp,N)
-    
-    
+
+
     #Coupling part of the 1e- terms
     #periodic boundary
     if boundary is True:
-        hmat[ 0, N-1 ] = hmat[ N-1, 0 ] = tleads*boundary
-    
+        hmat[ 0, N-1 ] = hmat[ N-1, 0 ] = -tleads*boundary
+
     #left lead
     for lead in left_indx[:-1]:
-        hmat[ lead, lead+1 ] = tleads
-        hmat[ lead+1, lead ] = tleads
+        hmat[ lead, lead+1 ] = -tleads
+        hmat[ lead+1, lead ] = -tleads
     #left lead - impurity
-    hmat[ left_indx[-1], imp_indx[0] ] = timplead
-    hmat[ imp_indx[0], left_indx[-1] ] = timplead      
+    hmat[ left_indx[-1], imp_indx[0] ] = -timplead
+    hmat[ imp_indx[0], left_indx[-1] ] = -timplead
     #impurities
     for imp in imp_indx[:-1]:
-        hmat[ imp, imp+1 ] = timp
-        hmat[ imp+1, imp ] = timp
+        hmat[ imp, imp+1 ] = -timp
+        hmat[ imp+1, imp ] = -timp
     #impurity - right lead
-    hmat[ imp_indx[-1], right_indx[0] ] = timplead
-    hmat[ right_indx[0], imp_indx[-1] ] = timplead
+    hmat[ imp_indx[-1], right_indx[0] ] = -timplead
+    hmat[ right_indx[0], imp_indx[-1] ] = -timplead
     #right lead
     for lead in right_indx[:-1]:
-        hmat[ lead, lead+1 ] = tleads
-        hmat[ lead+1, lead ] = tleads
+        hmat[ lead, lead+1 ] = -tleads
+        hmat[ lead+1, lead ] = -tleads
 
     #Diagonal part of the 1e- terms
     #impurities
@@ -471,14 +471,12 @@ def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, 
             Vmat[imp,imp,imp,imp] = U
     else:
         Vmat = U
-    #ERR
-    hmat = np.copy(hmat)*-1
     return hmat,Vmat
 
 #####################################################################
 
 def make_ham_diatomic_sto3g(typ,R):
-    #subroutine to generate the overlap matrix, S, core hamiltonian, Hcore, 
+    #subroutine to generate the overlap matrix, S, core hamiltonian, Hcore,
     #and a 4-index matrix of the 2-e integrals, g, for the diatomics H2 or HeH+
     #in the STO-3G basis
 

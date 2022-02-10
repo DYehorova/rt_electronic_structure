@@ -13,7 +13,7 @@ import sys
 import os
 import ctypes
 import numpy
-import real_time_elec_structureGN.scripts.utils as utils
+import feb_8_update.scripts.utils as utils
 import pyscf.lib
 import pyscf.ao2mo
 import pyscf.fci

@@ -1,28 +1,22 @@
 import numpy as np
 import time
-import os
 import scipy.linalg as la
-import sys
-#import research.hf as hf
-import hf
-#import research.fragment_mod as fragment_mod
-import fragment_mod
-sys.path.append('/storage/home/hcoda1/2/dyehorova3/research/pdmetUnrestricted/libdmet_pre_release/')
-#from fci_mod import RHF
+import feb_8_update.static.hf as hf
+import feb_8_update.static.fragment_mod as fragment_mod
 from pyscf import gto, scf, ao2mo
-#from research.quad_fit import quad_fit_mu
-from quad_fit import quad_fit_mu
+from feb_8_update.static.quad_fit import quad_fit_mu
 from math import copysign
 from pyscf import lib
-import libdmet_solid.dmet.Hubbard as dmet
 DiisDim = 4
-dc = dmet.FDiisContext(DiisDim)
 adiis = lib.diis.DIIS()
 adiis.space = DiisDim
 
+
 class static_pdmet():
 
-    def __init__(self, Nsites, Nele, Nfrag, impindx, h_site, V_site, U, Maxitr, mf1RDM, tol, hamtype=0, mubool=False, muhistory=False, hubb_indx=None, nelecTol = 1e-5, dmu = 0.02, step = 0.05, trust_region=2.5 ):
+    def __init__(self, Nsites, Nele, Nfrag, impindx, h_site, V_site, U, Maxitr,\
+                 mf1RDM, tol, hamtype=0, mubool=False, muhistory=False, hubb_indx=None,\
+                 nelecTol = 1e-5, dmu = 0.02, step = 0.05, trust_region=2.5):
         """
         Nsites    - total number of sites (or basis functions) in total system
         Nele      - total number of electrons
@@ -42,7 +36,6 @@ class static_pdmet():
         print('         INITIALIZING PDMET          ')
         print('***************************************')
         print()
-        
 
         self.mubool = mubool
         self.muhistory = muhistory
@@ -63,52 +56,38 @@ class static_pdmet():
         self.mu = 0
         self.DiisStart = 4
         self.DiisDim = 4
-        self.history =[]
-        self.output_mu = open('output_staticCont.dat', 'w')
-     
-    
-    # Check the input information
-
-       # self.check_the_input(( Nsites, Nele, Nfrag, impindx, h_site, V_site, hamtype, periodic ))
+        self.history = []
 
     # Calculate an initial mean-field Hamiltonian
 
         print('Calculating initial mean-field Haamiltonian')
-        if (hamtype == 0): 
-        #    mf1RDM = hf.hubbard_1RDM(self.Nele, h_site) 
-            #mf1RDM = self.initialize_UHF(h_site, V_site)  # !!! UHF is still broken!
-            #mf1RDM = np.load("mfRDM_static.npy")
+        if (hamtype == 0):
+            # mf1RDM = hf.hubbard_1RDM(self.Nele, h_site)
+            # mf1RDM = self.initialize_UHF(h_site, V_site)
             if mf1RDM is None:
                 mf1RDM = self.initialize_RHF(h_site, V_site)
                 self.old_glob1RDM = np.copy(mf1RDM)
-            else: 
-         #       self.old_glob1RDM = None
-                self.old_glob1RDM = np.copy(mf1RDM) 
+            else:
+                self.old_glob1RDM = np.copy(mf1RDM)
 
-            #mf1RDM = np.copy(mfRDM)
         else:
-         #   mf1RDM = hf.hubbard_1RDM(self.Nele, h_site)
-            #mf1RDM = np.load("mfRDM_static.npy")
-            #mf1RDM = np.copy(mfRDM)
-            #mf1RDM = self.initialize_UHF(h_site, V_site)
+            # mf1RDM = hf.hubbard_1RDM(self.Nele, h_site)
+            # mf1RDM = self.initialize_UHF(h_site, V_site)
             if mf1RDM is None:
                 mf1RDM = self.initialize_RHF(h_site, V_site)
                 self.old_glob1RDM = np.copy(mf1RDM)
-            else: 
-               # self.old_glob1RDM = np.zeros((self.Nsites,self.Nsites))
+            else:
                 self.old_glob1RDM = np.copy(mf1RDM)
-        self.V_site = self.U
-        #random noise
-       # noise_triag = np.triu(np.random.random([Nsites, Nsites]))
-       # mf1RDM += noise_triag + noise_triag.transpose() -2*np.diag(noise_triag)
- 
 
-#        print("shape of new RDM:", mf1RDM.shape)
+        self.V_site = self.U
+
+        # random noise
+        # noise_triag = np.triu(np.random.random([Nsites, Nsites]))
+        # mf1RDM += noise_triag + noise_triag.transpose() -2*np.diag(noise_triag)
+
         self.mf1RDM = mf1RDM
 
-
     # Initialize the system from mf 1RDM and fragment information
-
         print('Initialize fragment information')
 
         self.frag_list = []
@@ -122,10 +101,9 @@ class static_pdmet():
             for ifrag, array in enumerate(impindx):
                 if (i in array):
                     self.site_to_frag_list.append(ifrag)
-                    self.site_to_impindx.append( np.argwhere(array==i)[0][0] )    
-# self.tot_system = system.tot_system()	
-    #output file
-#    self.tot_system = pDMET.static_pdmet( Nsites, Nele, Nfrag, impindx, h_site, V_site, hamtype, mf1RDM, hubsite_indx, periodic )
+                    self.site_to_impindx.append( np.argwhere(array==i)[0][0] )
+    # output file
+        self.file_output = open( 'output.dat', 'w' )
 ##########################################################
 
     def kernel(self):
@@ -144,8 +122,8 @@ class static_pdmet():
         conv = False
         old_E = 0.0
         old_mf1RDM =  np.copy(self.mf1RDM)
-    #    old_glob1RDM = np.copy(self.mf1RDM)
-        old_glob1RDM = np.copy(self.old_glob1RDM) 
+        old_glob1RDM = np.copy(self.old_glob1RDM)
+
         for itr in range(self.Maxitr):
             print('itr', itr)
 
@@ -158,9 +136,9 @@ class static_pdmet():
                 totalNele_0 = self.corr_calc_with_mu(self.mu)
                 #totalNele_0 = self.get_Nele(self.mu)
                 record = [(0.0, totalNele_0)]
-                
+
                 print('####DONE WITH FIRST FCI LOOP####totalNele_0:', totalNele_0)
-                
+
                 if abs((totalNele_0/self.Nele)-1.0) < self.nelecTol:
                     print('chemical potential fitting is unnecessary')
                     total_Nele = totalNele_0
@@ -190,8 +168,6 @@ class static_pdmet():
                         self.history.append(record)
                         self.mu = test_mu
                         total_Nele = totalNele_1
-                        #last_dmu = self.dmu
-                        #self.Hemb_add_mu(last_dmu)
 
                     else:
                         Neleprime = (totalNele_1 - totalNele_0) /self.dmu
@@ -204,15 +180,12 @@ class static_pdmet():
 
                         test_mu = self.mu + dmu1
                         totalNele_2 = self.corr_calc_with_mu(test_mu)
-                        #totalNele_2 = self.get_Nele(dmu1)
                         record.append((dmu1, totalNele_2))
 
                         if abs((totalNele_2/self.Nele)-1.0) < self.nelecTol:
                             print('chemical potential is converged with dmu1:', dmu1)
                             self.mu = test_mu
-                            #last_dmu = dmu1
                             self.history.append(record)
-                            #self.Hemb_add_mu(last_dmu)
                             total_Nele = totalNele_2
 
                         else:
@@ -222,15 +195,12 @@ class static_pdmet():
 
                             test_mu = self.mu + dmu2
                             totalNele_3 = self.corr_calc_with_mu(test_mu)
-                            #totalNele_3 = self.get_Nele(dmu2)
                             record.append((dmu2, totalNele_3))
 
                             if abs((totalNele_3/self.Nele)-1.0) < self.nelecTol:
                                 print('chemical potential is converged with dmu2:', dmu2)
                                 self.mu = test_mu
-                                #last_dmu = dmu2
                                 self.history.append(record)
-                                #self.Hemb_add_mu(last_dmu)
                                 total_Nele = totalNele_3
                             else:
                                 mus = np.array([0.0, self.dmu, dmu1, dmu2])
@@ -239,80 +209,43 @@ class static_pdmet():
 
                                 test_mu = self.mu + dmu3
                                 totalNele_4 = self.corr_calc_with_mu(test_mu)
-                                #totalNele_4 = self.get_Nele(dmu3)
                                 print('mu didnt converge, final number of electrons:', totalNele_4 )
                                 record.append((dmu3, totalNele_4))
                                 total_Nele = totalNele_4
-                                #last_dmu = dmu3
                                 self.history.append(record)
                                 self.mu = test_mu
-                                #self.Hemb_add_mu(last_dmu)
-                
 
-                #self.mu = +last_dmu
+
 
             else:
-                #print("going no mu route")
+                print("going no mu route")
 
                 for frag in self.frag_list:
-
                     frag.corr_calc( self.mf1RDM, self.h_site, self.V_site, self.U, self.mu, self.hamtype, self.hubb_indx, self.mubool)
-
                     print("done with core calculation for fragment", frag)
-     #constract a global dencity matrix from all impurities
-            print("done calculating corr")
+
+     # constract a global dencity matrix from all impurities
             self.get_globalRDM()
-            print("done with global rdm")
-     #form a new mean-field RDM
 
-           # self.get_nat_orbs() #use natural orbitals of Global RDM to get a new MF 1RDM
-            #self.get_new_mfRDM(int(self.Nele/2))
+     # DIIS routine
 
 
-     #check the difference between new and old mean field RDM
-
-    #        if( itr > 0 ):
-     #           dif = np.linalg.norm( old_glob1RDM - self.glob1RDM)
-      #          if( dif < self.tol ):
-       #             conv = True
-        #            break
-
-            #old_glob1RDM = np.copy( self.glob1RDM )
-
-     #DIIS routine
-
-        #    if np.allclose(old_glob1RDM, np.zeros((self.Nsites, self.Nsites)), rtol=0, atol=1e-12) is True:
-              #  old_glob1RDM = np.copy(self.glob1RDM)
-              #  print("old global", old_glob1RDM)
-              #  print("global", self.glob1RDM)
-               # old_E = None
- 
             if itr >= self.DiisStart:
                 #self.mf1RDM = adiis.update(self.mf1RDM)
                 self.glob1RDM = adiis.update(self.glob1RDM)
-                #print("doing DIIS")
-                #self.get_nat_orbs()
-                #self.get_new_mfRDM(int(self.Nele/2))
-            print("taking a difference")
+            #dif = (self.glob1RDM - old_glob1RDM)
             dif = np.linalg.norm( self.glob1RDM - old_glob1RDM)
             #dif = np.linalg.norm( self.mf1RDM - old_mf1RDM)
             dVcor_per_ele = self.max_abs(dif)
-            
 
-            #copy over old global 1RDM
-            old_glob1RDM = np.copy( self.glob1RDM )
-            #old_mf1RDM = np.copy( self.mf1RDM)
-            print("getting natural orbitals")
+            old_glob1RDM = np.copy(self.glob1RDM)
+            #old_mf1RDM = np.copy(self.mf1RDM)
+
+    # getting natural orbitals from eigenvectors of the global rdm
             self.get_nat_orbs()
-            print("forming new mf")
             self.get_new_mfRDM(int(self.Nele/2))
-            print("getting dmet emergy")
             self.get_DMET_E()
-            print( 'Final DMET energy =', self.DMET_E )
-            print('Energy per site for U=', self.U, 'is:', (self.DMET_E/self.Nsites))
-            total_Nele = self.just_Nele() 
-            if itr >= 10:
-                self.calc_data(itr, dif, total_Nele)
+            total_Nele = self.just_Nele()
 
             if old_E is None:
                 old_E = np.copy(self.DMET_E)
@@ -323,22 +256,20 @@ class static_pdmet():
           #      conv = True
            #     break
 
-           # if( np.mod( itr, self.Maxitr/10 ) == 0 and itr >0 ):
-            #    print('Finished DMET Iteration', itr)
-             #   print('Current difference in global 1RDM =', dif)
-              #  print('vcore=', dVcor_per_ele)
-              #  print()
-               # self.calc_data(itr, dif, total_Nele)
+            if( np.mod( itr, self.Maxitr/100 ) == 0 and itr >0 ):
+                print('Finished DMET Iteration', itr)
+                print('Current difference in global 1RDM =', dif)
+                print('vcore=', dVcor_per_ele)
+                self.calc_data(itr, dif, total_Nele)
 
-            print("difference", dif)
+            print("difference", dif, "dVcor", dVcor_per_ele, "dE", dE)
             if dVcor_per_ele < self.tol and abs(dE) < 1.0e-6:
                 conv = True
                 break
-            
-        
+
+
         print( 'Final DMET energy =', self.DMET_E )
         print('Energy per site for U=', self.U, 'is:', (self.DMET_E/self.Nsites))
-        #ERRRRR FOr U=0 only
         if( conv ):
             print('DMET calculation succesfully converged in',itr,'iterations')
             print('Final difference in global 1RDM =',dif)
@@ -347,30 +278,13 @@ class static_pdmet():
         else:
             print('WARNING: DMET calculation finished, but did not converge in', self.Maxitr, 'iterations')
             print('Final difference in global 1RDM =',dif)
-            end_time = time.perf_counter()
-            total_time = end_time - start_time
-            print('total_time', total_time)
-            self.output_mu.close()
-            quit()
-        np.save("mf1RDMN12Nimp3", self.mf1RDM)
-        print("mean field stat", self.mf1RDM)
-        print("global static", self.glob1RDM)
-#        CI_list = []
-#        rotmat_list = []
-#        for frag in self.frag_list:    
-#            CI_list.append(frag.rotmat)
-#            rotmat_list.append(frag.CIcoeffs)
-#        np.save("CIN12Nimp3", CI_list)
-#        np.save("rotmatN12Nimp3", rotmat_list)
 
+        np.save("mf1RDMN12Nimp3", self.mf1RDM)
         end_time = time.perf_counter()
         total_time = end_time - start_time
         print('total_time', total_time)
-        self.output_mu.close()
-        #self.output_mf1RDM.close()
-
+        self.file_output.close()
 ##########################################################
-    
 
     def max_abs(self, x ):
         #Equivalent to np.max(np.abs(x)), but faster.
@@ -379,10 +293,9 @@ class static_pdmet():
         else:
             return max(np.max(x), abs(np.min(x)))
 ##########################################################
-    
 
     def initialize_UHF( self, h_site, V_site ):
-        
+
         Norbs = self.Nele
         mol = gto.M()
         mol.nelectron = self.Nele
@@ -393,17 +306,14 @@ class static_pdmet():
         mf._eri = ao2mo.restore(8, V_site, Norbs)
     #    evals, h = np.linalg.eigh(h_site)
    #     mf.init_guess = h
-    
-#        print ("read new line") 
+
         mf.kernel()
- #       print("finished UHF successfully")
         mfRDM = mf.make_rdm1()
-        
-       
+
         return mfRDM
 ##########################################################
     def initialize_RHF( self, h_site, V_site ):
-        
+
         Norbs = self.Nele
         mol = gto.M()
         mol.nelectron = self.Nele
@@ -413,16 +323,14 @@ class static_pdmet():
         print(V_site)
         mf.get_hcore = lambda *args: h_site
         mf.get_ovlp = lambda *args: np.eye(Norbs)
-       
+
         mf._eri = ao2mo.restore(8, V_site, Norbs)
     #    evals, h = np.linalg.eigh(h_site)
    #     mf.init_guess = h
-    
-#        print ("read new line") 
         mf.kernel()
         mfRDM = mf.make_rdm1()
         print("succesfully finished rhf")
-       
+
         return mfRDM
 
 ##########################################################
@@ -431,10 +339,8 @@ class static_pdmet():
         #need to update rotation matrices and correlated 1 RDMs
 
         #initialize glodal 1RDM to be complex if rotation matrix or correlated 1RDM is complex
-        
         #if(np.iscomplexobj( self.frag_list[0].rotmat  ) or  np.iscomplexobj( self.frag_lsit[0].corr1RDM  ) ):
          #   self.glob1RDM = np.zeros( [self.Nsites, self.Nsites ], dtype=complex )
-
 
         self.glob1RDM = np.zeros( [self.Nsites, self.Nsites] )
 
@@ -447,11 +353,6 @@ class static_pdmet():
                 pfrag = self.frag_list[self.site_to_frag_list[p] ]
                 qfrag = self.frag_list[self.site_to_frag_list[q] ]
 
-#    #            print('q', q)
-#     #           print('self.site_to_frag_list', len(self.site_to_frag_list))
-#      #          print('self.frag_list', len(self.frag_list))
-#       #         print('self.site_to_frag_list[q]', self.site_to_frag_list[q])
-#
 #                #index corresponding to the impurity and bath range in the rotation matrix for each fragment
 #                #rotation matrix order:(sites) x (impurity, virtual, bath, core)
 #
@@ -466,7 +367,7 @@ class static_pdmet():
                     self.glob1RDM[q,p] = np.conjugate( self.glob1RDM[p,q] )
         trace1RDM = self.glob1RDM.trace()
         print("trace of global RDM", trace1RDM)
-            
+
         #print('global RDM',  self.glob1RDM)
 #        Nimp = self.frag_list[0].Nimp
 #        if( np.iscomplexobj( self.frag_list[0].rotmat ) or np.iscomplexobj( self.frag_list[0].corr1RDM ) ):
@@ -484,9 +385,9 @@ class static_pdmet():
 #        tmp  = np.einsum( 'paq,aq->pq', rotmat_unpck, corr1RDM_unpck )
 #        self.glob1RDM = 0.5*( tmp + tmp.conj().T )
 #        #print(np.allclose(self.glob1RDM_Josh, self.glob1RDM, 10-10))
-        #print(self.glob1RDM_Josh-self.glob1RDM)    
-        
-        
+        #print(self.glob1RDM_Josh-self.glob1RDM)
+
+
 ##########################################################
 
 
@@ -733,15 +634,15 @@ class static_pdmet():
         output = np.zeros(6+self.Nsites)
         output[0] = itr
         output[1] = self.mu
-        output[2] = dif	
-        output[3] = total_Nele 
+        output[2] = dif
+        output[3] = total_Nele
         output[4] = self.DMET_E/self.Nsites
         output[5:5+self.Nsites] = self.NOevals
-        np.savetxt( self.output_mu, output.reshape(1, output.shape[0]), fmt_str )
-        self.output_mu.flush()
+        np.savetxt( self.file_output, output.reshape(1, output.shape[0]), fmt_str )
+        self.file_output.flush()
         #print("shape of RDM:",self.mf1RDM.shape)
         np.save("mfRDM_static", self.mf1RDM)
-        np.save("globRDM_static", self.glob1RDM) 
+        np.save("globRDM_static", self.glob1RDM)
         CI = []
         rotmat = []
         for frag in self.frag_list:
@@ -769,5 +670,5 @@ class static_pdmet():
         self.DMET_E = 0.0
         for frag in self.frag_list:
             frag.get_frag_E()
-            #print('fragment Energy', frag.Efrag)
+            # print('fragment Energy', frag.Efrag)
             self.DMET_E += np.real( frag.Efrag ) #discard what should be numerical error of imaginary part

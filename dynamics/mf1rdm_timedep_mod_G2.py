@@ -3,7 +3,7 @@
 #this is necessary when integrating the MF 1RDM and CI coefficients explicitly
 #while diagonalizing the MF 1RDM at each time-step to obtain embedding orbitals
 
-import real_time_elec_structureGN.scripts.utils as utils
+import feb_8_update.scripts.utils as utils
 import numpy as np
 import multiprocessing as multproc
 
@@ -11,10 +11,10 @@ import time
 
 #####################################################################
 def get_ddt_mf_NOs( system, G_site ):
-    
+
     ddt_mf1RDM = (-1j * ( np.dot( G_site, system.mf1RDM ) - np.dot( system.mf1RDM, G_site ) ))
     ddt_NOevecs = (-1j * np.dot(G_site, system.NOevecs))
-         
+
     return ddt_mf1RDM, ddt_NOevecs
 #####################################################################
 def get_ddt_glob( dG, system):
@@ -32,8 +32,8 @@ def get_ddt_glob( dG, system):
     G_site = calc_Gmat(dG, system, iddt_glob1RDM )
     print("gmat time ", time.time()-Gmat_time)
     ddt_glob1RDM = -1j * iddt_glob1RDM
-    
-    return ddt_glob1RDM, G_site 
+
+    return ddt_glob1RDM, G_site
 #####################################################################
 def get_ddt_mf1rdm_serial(dG, system, Nocc ):
 
@@ -67,7 +67,7 @@ def get_ddt_mf1rdm_serial(dG, system, Nocc ):
     #G_site = utils.rot1el( G, utils.adjoint(system.NOevecs) )
     #calculate derivative of natural orbitals
     #ERR
-    
+
     ddt_mf1RDM = (-1j * ( np.dot( G_site, system.mf1RDM ) - np.dot( system.mf1RDM, G_site ) ))
     ddt_NOevecs = (-1j * np.dot(G_site, system.NOevecs))
 
@@ -115,7 +115,7 @@ def calc_iddt_glob1RDM( system ):
 
     #calculate intermediate matrix
     tmp  = np.einsum( 'paq,aq->pq', rotmat_unpck, iddt_corr1RDM_unpck )
-   
+
 
 
 
@@ -146,7 +146,7 @@ def calc_Gmat( dG, system, iddt_glob1RDM ):
  #           if( a != b and np.abs( evals[a] - evals[b] ) > 1e-5 ):
  #               eval_dif[a,b] = 1.0 / ( evals[b] - evals[a] )
 
- #   G1 = utils.rot1el( iddt_glob1RDM, system.NOevecs )     
+ #   G1 = utils.rot1el( iddt_glob1RDM, system.NOevecs )
  #   G1 = np.multiply( eval_dif, G1 )
  #   G1 = np.triu(G1) + np.triu(G1,1).conjugate().transpose()
  #   G1_site = utils.rot1el( G1, utils.adjoint(system.NOevecs) )
@@ -167,7 +167,7 @@ def calc_Gmat( dG, system, iddt_glob1RDM ):
  #                       G2[mu, nu] += (np.conjugate(system.NOevecs[p, mu]) * iddt_glob1RDM[p,q] * system.NOevecs[q, nu])/(evals[nu]-evals[mu])
  #                   else:
  #                       G2[mu, nu] = 0
- #   G2 = np.triu(G2) + np.triu(G2,1).conjugate().transpose() 
+ #   G2 = np.triu(G2) + np.triu(G2,1).conjugate().transpose()
  #   G2_site = utils.rot1el( G2, utils.adjoint(system.NOevecs) )
  #   print("G2 time", time.time()-G2_time)
     G2_fast_time=time.time()
@@ -178,10 +178,10 @@ def calc_Gmat( dG, system, iddt_glob1RDM ):
                 G2_fast[a,b] /= ( evals[b] - evals[a] )
             else:
                 G2_fast[a,b] = 0
-    G2_fast = np.triu(G2_fast) + np.triu(G2_fast,1).conjugate().transpose() 
+    G2_fast = np.triu(G2_fast) + np.triu(G2_fast,1).conjugate().transpose()
     G2_site = utils.rot1el( G2_fast, utils.adjoint(system.NOevecs) )
     print("G2 fast time", time.time()-G2_fast_time)
-    
+
 ########################
 
 ######## Method 3 Full site basis
@@ -208,10 +208,10 @@ def calc_Gmat( dG, system, iddt_glob1RDM ):
 #for a in range(system.Nsites):
  #       for b in range(system.Nsites):
            # if( a != b and np.abs( evals[a] - evals[b] ) > dG):
-   #         eval_dif_sum += ( evals[b] - evals[a] )                
-   # Gt_site /= eval_dif_sum  
-   # Gmat_test_herm = np.triu(Gt_site) + np.triu(Gt_site,1).conjugate().transpose()  
-    
+   #         eval_dif_sum += ( evals[b] - evals[a] )
+   # Gt_site /= eval_dif_sum
+   # Gmat_test_herm = np.triu(Gt_site) + np.triu(Gt_site,1).conjugate().transpose()
+
 #  print("1/eval_dif", eval_dif)
     #Rotate iddt_glob1RDM
     #Gmat = np.zeros( [ system.Nsites, system.Nsites ] )
@@ -230,7 +230,7 @@ def calc_Gmat( dG, system, iddt_glob1RDM ):
     #Force Hermiticity (this is all inefficient as of now)
    # Gmat2 = np.triu(Gmat1) + np.triu(Gmat1,1).conjugate().transpose()
    # Gmat_site = utils.rot1el( Gmat2, utils.adjoint(system.NOevecs) )
-    
+
    # print("GMAT IN SITE BASIS", np.allclose(Gmat_test_herm, Gmat_site, rtol=0.0, atol=1e-10))
    # print("differnce", Gmat_test_herm -Gmat_site)
    # G_test = utils.rot1el( iddt_glob1RDM, system.NOevecs )
@@ -242,8 +242,8 @@ def calc_Gmat( dG, system, iddt_glob1RDM ):
    # G_2 = np.triu(G_test) + np.triu(G_test,1).conjugate().transpose()
    # G_site = utils.rot1el( G_2, utils.adjoint(system.NOevecs) )
    # print("GMAT IN SITE BASIS", np.allclose(G_site, Gmat_site, rtol=0.0, atol=1e-10))
-   # print("difference", G_site-Gmat_site) 
-    
+   # print("difference", G_site-Gmat_site)
+
     #quit()
         #  print("Gmat hermitian", Gmat2)
     #mrar

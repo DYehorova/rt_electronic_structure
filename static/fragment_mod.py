@@ -2,10 +2,8 @@
 
 import numpy as np
 import sys
-#import research.codes as codes
-#import research.fci_mod as fci_mod
-import codes
-import fci_mod
+import feb_8_update.static.codes as codes
+import feb_8_update.static.fci_mod as fci_mod
 
 class fragment():
 
@@ -47,7 +45,7 @@ class fragment():
 
         print(mf1RDM.shape)
         print(self.impindx)
-        
+
         mf1RDM = np.delete( mf1RDM, self.impindx, axis = 0 ) #delete raws that correspond to impurity sites
 
         mf1RDM = np.delete( mf1RDM, self.impindx, axis = 1 ) #delete columns that correspond to impurity sites
@@ -55,24 +53,24 @@ class fragment():
         #diagonalize environment part of 1RDM to obtain embedding (virtual, bath, core) orbitals
         evals, evecs = np.linalg.eigh( mf1RDM )
         print(evecs.shape)
-      #  print("diagonalized environment")       
+      #  print("diagonalized environment")
       #  print(np.conjugate(evecs.T) @ mf1RDM @ evecs)
-        
+
         #form rotation matrix consisting of unit vectors for impurity and the evecs for embedding
         #rotation matrix is ordered as impurity, virtual, bath, core
-#ERR a lot slower for single impurity correct order 
+#ERR a lot slower for single impurity correct order
         self.rotmat = np.zeros( [ self.Nsites, self.Nimp ] )
         for imp in range(self.Nimp):
             indx = self.impindx[imp]
             self.rotmat[ indx, imp ] = 1.0
            # print("imp block")
            # print(self.rotmat)
-        
+
         if self.impindx[0] > self.impindx[self.Nimp-1]:
             for imp in range(self.Nimp):
-            #ERR added for 1 imp hamiltonian 
+            #ERR added for 1 imp hamiltonian
                 rev_impindx = np.flipud(self.impindx)
-                indx = rev_impindx[imp] 
+                indx = rev_impindx[imp]
                 print("rev index:", indx)
                 if indx <= evecs.shape[0]:
                     print("doing regular insertion")
@@ -86,7 +84,7 @@ class fragment():
            #     print("evecs", evecs)
         else:
             for imp in range(self.Nimp):
-                indx = self.impindx[imp] 
+                indx = self.impindx[imp]
                 print("rev index:", indx)
                 if indx <= evecs.shape[0]:
                     print("doing regular insertion")
@@ -195,7 +193,7 @@ class fragment():
         #for core1 in range( 2*self.Nimp, 2*self.Nimp+self.Ncore ):
 
          #   Ecore += 2*h_emb[ core1, core1 ]
-            
+
           #  if ( hamtype == 0 ):
                 #General hamiltonian
             #    for core2 in range( 2*self.Nimp, 2*self.Nimp+self.Ncore ):
