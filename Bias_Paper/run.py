@@ -7,10 +7,10 @@ import feb_8_update.dynamics.dynamics_driver_optimize as dynamic_driver
 
 # set up system and static pdmet parameters
 boundary = False
-NL = 32
-NR = 31
+NL = 33
+NR = 32
 Ndots = 1
-Nimp = 4
+Nimp = 3
 Nsites = NL+NR+Ndots
 Nele = Nsites
 Nfrag = int(Nsites/Nimp)
@@ -71,7 +71,7 @@ system = transition_driver.transition(
 # dynamics variables
 delt = 0.001
 Nstep = 10000
-Nprint = 100
+Nprint = 10
 init_time = 0.0
 dG = 1e-6
 nproc = 1
