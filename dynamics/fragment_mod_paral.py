@@ -1,4 +1,5 @@
-# Define a class for a fragment, including all quantities specific to a given fragment
+# Define a class for a fragment,
+# including all quantities specific to a given fragment
 import numpy as np
 import feb_8_update.dynamics.fci_mod as fci_mod
 import feb_8_update.scripts.utils as utils
@@ -12,24 +13,33 @@ class fragment():
     #####################################################################
 
     def __init__(self, impindx, Nsites, Nele):
-        self.impindx = impindx # array defining index of impurity orbitals in site basis
-        self.Nimp    = impindx.shape[0] # number of impurity orbitals in fragment
-        self.Nsites  = Nsites # total number of sites (or basis functions) in total system
-        self.Nele    = Nele # total number of electrons in total system
+        self.impindx = impindx
+        # array defining index of impurity orbitals in site basis
+        self.Nim = impindx.shape[0]
+        # number of impurity orbitals in fragment
+        self.Nsites = Nsites
+        # total number of sites (or basis functions) in total system
+        self.Nele = Nele
+        # total number of electrons in total system
 
-        self.Ncore = int(Nele/2) - self.Nimp # Number of core orbitals in fragment
-        self.Nvirt = Nsites - 2*self.Nimp - self.Ncore # Number of virtual orbitals in fragment
+        self.Ncore = int(Nele/2) - self.Nimp
+        # Number of core orbitals in fragment
+        self.Nvirt = Nsites - 2*self.Nimp - self.Ncore
+        # Number of virtual orbitals in fragment
 
-        # range of orbitals in embedding basis, embedding basis always indexed as impurity, virtual, bath, core
-        self.imprange  = np.arange(0, self.Nimp)
+        # range of orbitals in embedding basis,
+        # embedding basis always indexed as impurity, virtual, bath, core
+
+        self.imprange = np.arange(0, self.Nimp)
         self.virtrange = np.arange(self.Nimp, self.Nimp+self.Nvirt)
-        self.bathrange = np.arange(self.Nimp+self.Nvirt, 2*self.Nimp+self.Nvirt)
+        self.bathrange = np.arange(
+            self.Nimp+self.Nvirt, 2*self.Nimp+self.Nvirt)
         self.corerange = np.arange(2*self.Nimp+self.Nvirt, self.Nsites)
 
-        self.last_imp      = self.Nimp
-        self.last_virt     = self.Nimp + self.Nvirt
-        self.last_bath     = 2*self.Nimp + self.Nvirt
-        self.last_core     = self.Nsites
+        self.last_imp = self.Nimp
+        self.last_virt = self.Nimp + self.Nvirt
+        self.last_bath = 2*self.Nimp + self.Nvirt
+        self.last_core = self.Nsites
 
     #####################################################################
 
@@ -293,7 +303,7 @@ class fragment():
         '''
         Calculate the Hamiltonian commutator portion of
         the time-dependence of correlated 1RDM for each fragment
-        ie i\tilde{ \dot{ correlated 1RDM } } using notation from notes
+        ie { dot{ correlated 1RDM } } using notation from notes
         indexing in the embedding basis goes as
         ( impurities, virtual, bath, core )
 

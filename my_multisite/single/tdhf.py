@@ -91,13 +91,14 @@ class tdhf():
         output[0] = current_time
         output[1] = Etot
         output[2] = Nele
-        print(self.h_site[31,30])
-        print(self.h_site[32,31])
+        #print(self.h_site[31,30])
+        #print(self.h_site[32,31])
         #JL = 1j*self.h_site[31,30]*(self.mf1RDM[31,30]-self.mf1RDM[30,31])
         #JR = 1j*self.h_site[32,31]*(self.mf1RDM[32,31]-self.mf1RDM[31,32])
-        JL = 1j*self.h_site[0,1]*(self.mf1RDM[0,1]-self.mf1RDM[1,0])
-        JR = 1j*self.h_site[2,0]*(self.mf1RDM[2,0]-self.mf1RDM[0,2])
-        J = (1/0.001)*((JL+JR)/2)
+        #JL = 1j*self.h_site[0,1]*(self.mf1RDM[0,1]-self.mf1RDM[1,0])
+        #JR = 1j*self.h_site[2,0]*(self.mf1RDM[2,0]-self.mf1RDM[0,2])
+        #J = (1/0.001)*((JL+JR)/2)
+        J = 0
         output[3] = J
         np.savetxt( self.file_output, output.reshape(1, output.shape[0]), fmt_str )
         self.file_output.flush()

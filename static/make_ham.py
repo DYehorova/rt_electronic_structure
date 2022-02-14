@@ -13,26 +13,26 @@ def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, 
     timp  = timp * tleads
     timplead  = timplead * tleads
     Vbias = Vbias * tleads
-    print("noise", noise) 
+    print("noise", noise)
     #Initialize
     N = NL+NR+Nimp
     hmat = np.zeros([N,N])
-    
+
     #Lists for indices of left-lead, impurities, and right-lead
     left_indx = np.arange(NL)
     imp_indx  = np.arange(NL,NL+Nimp)
     right_indx = np.arange(NL+Nimp,N)
-    
+
     #Coupling part of the 1e- terms
-    #periodic boundary 
+    #periodic boundary
     if boundary is True:
         hmat[ 0, N-1 ] = hmat[ N-1, 0 ] = -tleads
 
     if noise is not None:
         hmat += np.diag(noise)
-    if halfU is True: 
+    if halfU is True:
         for imp in imp_indx:
-            hmat[ imp, imp ]=-U/2 
+            hmat[ imp, imp ]=-U/2
             print("hmat", hmat)
     #left lead
     for lead in left_indx[:-1]:
@@ -45,7 +45,7 @@ def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, 
     for imp in imp_indx[:-1]:
         hmat[ imp, imp+1 ] = -timp
         hmat[ imp+1, imp ] = -timp
-    
+
     #impurity - right lead
     hmat[ imp_indx[-1], right_indx[0] ] = -timplead
     hmat[ right_indx[0], imp_indx[-1] ] = -timplead
@@ -63,7 +63,7 @@ def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, 
     #right lead
     for lead in right_indx:
         hmat[lead,lead] += Vbias/2.0
-    
+
     #Form the trivial two electron terms
     if( Full ):
         Vmat = np.zeros( [ N, N, N, N ] )
@@ -91,14 +91,14 @@ def make_1D_hubbard(Nsites, U, boundary, Vbias, Full = False):
             Tmat [i, i] = -Vbias/2
         else :
             Tmat [i, i] = Vbias/2
-    Tmat [(Nsites-1), (Nsites-1)] = Vbias/2  
+    Tmat [(Nsites-1), (Nsites-1)] = Vbias/2
     if( Full ): Vmat [Nsites-1, Nsites-1, Nsites-1, Nsites-1 ] = U
     print(Tmat[(Nsites-1), (Nsites-1)])
     Tmat [ 0, Nsites-1 ] = Tmat [ Nsites - 1, 0 ] = -t*boundary #boundary condition
     print(Tmat[(Nsites-1), (Nsites-1)])
- 
-    
-        
+
+
+
     return Tmat, Vmat
 
 ####################################

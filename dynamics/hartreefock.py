@@ -1,11 +1,11 @@
 import numpy as np
 import scipy.linalg as la
-import sys
-import os
-from feb_8_update.scripts.utils import *
+from feb_8_update.scripts.utils import diagonalize
 from pyscf import gto, scf, ao2mo
 
 #####################################################################
+
+
 def interactive_RHF(Nele, h_site, V_site):
     Norbs = Nele
     mol = gto.M()
@@ -19,29 +19,26 @@ def interactive_RHF(Nele, h_site, V_site):
     mf1RDM = mf.make_rdm1()
 
     return mf1RDM
-
 #####################################################################
-def rhf_calc_hubbard(Nelec,Hcore):
 
-    #simplified subroutine to perform a mean-field (ie U=0) calculation for Hubbard model
 
-    #Diagonalize hopping-hamiltonian
-    evals,orbs = diagonalize(Hcore)
+def rhf_calc_hubbard(Nelec, Hcore):
 
-    #Form the 1RDM
-    P = rdm_1el(orbs,int(Nelec/2))
+    # simplified subroutine to perform a
+    # mean-field (ie U=0) calculation for Hubbard model
 
+    # Diagonalize hopping-hamiltonian
+    evals, orbs = diagonalize(Hcore)
+    # Form the 1RDM
+    P = rdm_1el(orbs, int(Nelec/2))
     return P
-
 #####################################################################
 
-def rdm_1el(C,Ne):
-    #subroutine that calculates and returns the one-electron density matrix in original site basis
 
-    Cocc = C[:,:Ne]
-    P = 2*np.dot( Cocc,np.transpose(np.conjugate(Cocc)) )
-
+def rdm_1el(C, Ne):
+    # subroutine that calculates and
+    # returns the one-electron density matrix in original site basis
+    Cocc = C[:, :Ne]
+    P = 2*np.dot(Cocc, np.transpose(np.conjugate(Cocc)))
     return P
-
 #####################################################################
-

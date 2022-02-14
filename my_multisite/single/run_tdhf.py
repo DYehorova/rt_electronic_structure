@@ -4,19 +4,19 @@ import feb_8_update.scripts.make_hams as make_hams
 import tdhf
 
 boundary = False
-NL     = 32
-NR     = 31
+NL     = 1
+NR     = 2
 Ndots  = 1
 
 Nsites = NL+NR+Ndots
 Nele   = Nsites
 
-t  = 0.4
+t  = 1.0
 Vg = 0.0
 Vbias = 0.0
 timp     = 1.0
 tleads  = 1.0
-timplead = 0.4
+timplead = 1.0
 
 Full    = True
 

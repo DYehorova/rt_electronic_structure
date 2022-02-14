@@ -30,9 +30,16 @@ def get_parabola_vertex(x, y, tol=1e-12):
         a = b = c = 0
         status = False
     else:
-        a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denomenator
-        b = (x3 * x3 * (y1 - y2) + x2 * x2 * (y3 - y1) + x1 * x1 * (y2 - y3)) / denomenator
-        c = (x2 * x3 * (x2 - x3) * y1 + x3 * x1 * (x3 - x1) * y2 + x1 * x2 * (x1 - x2) * y3) / denomenator
+        a = (
+            x3 * (y2 - y1) + x2 * (y1 - y3)
+            + x1 * (y3 - y2)) / denomenator
+        b = (
+            x3 * x3 * (y1 - y2) + x2 * x2 *
+            (y3 - y1) + x1 * x1 * (y2 - y3)) / denomenator
+        c = (
+            x2 * x3 * (x2 - x3) * y1 + x3 *
+            x1 * (x3 - x1) * y2 + x1 * x2 *
+            (x1 - x2) * y3) / denomenator
         status = True
     return a, b, c, status
 
@@ -128,16 +135,16 @@ def quad_fit(mu, dnelecs, tol=1e-12):
             roots = [roots[0].real, roots[1].real]
 
     if dnelecs_lst[0] >= 0.0:
-        left  = -np.inf
+        left = -np.inf
         right = mu_lst[0]
     elif dnelecs_lst[1] >= 0.0:
-        left  = mu_lst[0]
+        left = mu_lst[0]
         right = mu_lst[1]
     elif dnelecs_lst[2] >= 0.0:
-        left  = mu_lst[1]
+        left = mu_lst[1]
         right = mu_lst[2]
     else:
-        left  = mu_lst[2]
+        left = mu_lst[2]
         right = np.inf
 
     if roots[0] < right and roots[0] > left:
@@ -152,14 +159,17 @@ def quad_fit(mu, dnelecs, tol=1e-12):
         if roots[1] < right and roots[1] > left:
             return roots[1], True
         else:
-            print("Can not find proper root within the range, ", left, right,'and roots', roots)
+            print("Can not find proper root within the range, ",
+                  left, right, 'and roots', roots)
             return 0, False
-    # not sure about figuring out which root out of "roots" is chosen and how (lines 124 - 151)
+    # not sure about figuring out which root out of
+    # "roots" is chosen and how (lines 124 - 151)
 ##################################################################
 
 
 def has_duplicate(dmu, mus, tol=1e-6):
-    # return true if any of the arguments are the same within tolerance are the same as dmu
+    # return true if any of the arguments are
+    # the same within tolerance are the same as dmu
     dmus_abs = np.abs(mus - dmu)
     return (dmus_abs < tol).any()
 
@@ -201,9 +211,6 @@ def quad_fit_mu(mus, nelecs, filling, step):
     idx_dnelec = np.argsort(dnelec_abs, kind='mergesort')
     mus_sub = mus[idx_dnelec][:3]
     dnelec_sub = dnelec[idx_dnelec][:3]
-    print('mus_sub',mus_sub)
-
-    print('dnelec_sub', dnelec_sub)
 
     # quadratic fit
     dmu, status = quad_fit(mus_sub, dnelec_sub, tol=1e-12)
@@ -215,30 +222,35 @@ def quad_fit_mu(mus, nelecs, filling, step):
 
     if not status:
         print('quadratic fit failed or duplicated, use linear regression')
-        slope, intercept, r_value, p_value, std_err = stats.linregress(dnelec_sub, mus_sub)
+        slope, intercept, r_value, p_value, std_err = \
+            stats.linregress(dnelec_sub, mus_sub)
         dmu = intercept
 
     # check monotonic for the predict mu:
     if violate_previous_mu(dmu, mus, target, nelecs):
         print("predicted mu violates previous mus. Try linear regression.")
-        slope, intercept, r_value, p_value, std_err = stats.linregress(dnelec_sub, mus_sub)
+        slope, intercept, r_value, p_value, std_err = \
+            stats.linregress(dnelec_sub, mus_sub)
         dmu = intercept
 
         if violate_previous_mu(dmu, mus, target, nelecs):
-            print("predicted mu from linear regression also violates. use finite step.")
+            print("predicted mu from linear regression also violates",
+                  " use finite step.")
             step = min(step, 1e-3)
             dmu = math.copysign(step, (target - nelecs[-1])) + mus[-1]
-            # array[-1] - last term in the array, the most recent mu, nelec pair
+            # array[-1] - last term in array, the most recent mu, nelec pair
 
     if abs(dmu - mus[-1]) > step:
-        print("extrapolation dMu %20.12f more than trust step %20.12f", dmu - mus[-1], step)
+        print("extrapolation dMu %20.12f more than trust step %20.12f",
+              dmu - mus[-1], step)
         dmu = math.copysign(step, dmu - mus[-1]) + mus[-1]
 
     if has_duplicate(dmu, mus):
         print("duplicate in extrapolation.")
         dmu = math.copysign(step, dmu - mus[-1]) + mus[-1]
 
-    if (dmu - mus[-1]) * (target - nelecs[-1]) < 0 and abs(dmu - mus[-1]) > 2e-3 :
+    if ((dmu - mus[-1]) * (target - nelecs[-1]) < 0
+            and abs(dmu - mus[-1]) > 2e-3):
         print("extrapolation gives wrong direction, use finite difference")
         dmu = math.copysign(step, (target - nelecs[-1])) + mus[-1]
 

@@ -4,24 +4,23 @@ import feb_8_update.scripts.make_hams as make_hams
 import tdhf
 
 boundary = False
-NL     = 3
+NL     = 1
 NR     = 2
 Ndots  = 1
 
 Nsites = NL+NR+Ndots
 Nele   = Nsites
 
-t  = 0.4
-Vg = 0.5
-Vbias = 0.01
+t  = 1.0
+Vg = 0.0
 timp     = 1.0
 tleads  = 1.0
-timplead = 0.4
+timplead = 1.0
 
 Full    = True
 
 delt   = 0.001
-Nstep  = 10000
+Nstep  = 1000
 Nprint = 1
 
 #Initital Static Calculation
@@ -41,8 +40,8 @@ print("vsite single", V_site_single)
 print("vsite multi", V_site_multi)
 quit()
 U     = 0.0
-#Vbias_single = -0.001
-Vbias_multi = 0.001
+Vbias_single = -0.001
+#Vbias_multi = 0.001
 Full = False
 mf1RDM = hartreefock.interactive_RHF( Nele, h_site_multi, V_site_multi )
 
