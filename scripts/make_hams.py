@@ -388,7 +388,7 @@ def make_ham_wilson_chain( NL, NR, Vg, U, t, Vbias, tleads=1.0, Lambda=1.0, z=0.
 
 #####################################################################
 
-def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, Vbias, tleads=1.0, boundary=False, Full=False ):
+def make_ham_multi_imp_anderson_realspace( Nimp, NL, NR, Vg, U, timp, timplead, Vbias, tleads, boundary, Full ):
     #subroutine to generate one and two electron integrals for the symmetric multi-impurity anderson impurity model in real-space
     #ie have hopping terms between the lead states, as is done in RT-DMRG (see Heidrich-Meisner PRB 2009)
     #Returns an (NL+NR+Nimp)x(NL+NR+Nimp) array of the 1 e- terms
